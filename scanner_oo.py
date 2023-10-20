@@ -9,10 +9,23 @@ class Scanner(Lexer):
               BRACKETOPEN, BRACKETCLOSE, SQUAREBRACKETOPEN, SQUAREBRACKETCLOSE, CURLYBRACKETOPEN, CURLYBRACKETCLOSE,
               COLON,
               APOSTROPHE,
-              COMMA, SEMICOLON}
+              COMMA, SEMICOLON,
+              ID,
+              IF, ELSE,
+              WHILE, FOR,
+              BREAK, CONTINUE,
+              RETURN,
+              EYE, ZEROS, ONES,
+              PRINT,
+              FLOATNUM, INTNUM, STRING}
 
     # String containing ignored characters between tokens
     ignore = ' \t'
+    ignore_comment = r'\#.*'
+
+    @_(r'\n+')
+    def ignore_newline(self, t):
+        self.lineno += t.value.count('\n')
 
     # Regular expression rules for tokens
     ADD = r'\+'
@@ -45,11 +58,41 @@ class Scanner(Lexer):
     COMMA = r','
     SEMICOLON = r';'
 
-    ignore_comment = r'\#.*'
+    # Base ID rule
+    ID = r'[a-zA-Z_][a-zA-Z0-9_]*'
 
-    @_(r'\n+')
-    def ignore_newline(self, t):
-        self.lineno += t.value.count('\n')
+    # Special cases
+    ID['if'] = IF
+    ID['else'] = ELSE
+    ID['while'] = WHILE
+    ID['for'] = FOR
+    ID['break'] = BREAK
+    ID['continue'] = CONTINUE
+    ID['return'] = RETURN
+    ID['eye'] = EYE
+    ID['zeros'] = ZEROS
+    ID['ones'] = ONES
+    ID['print'] = PRINT
+
+    @_(r'[a-zA-Z_][a-zA-Z0-9_]*')
+    def ID(self, t):
+        t.value = str(t.value)
+        return t
+
+    @_(r'\d+\.\d+')
+    def FLOATNUM(self, t):
+        t.value = float(t.value)
+        return t
+
+    @_(r'\d+')
+    def INTNUM(self, t):
+        t.value = int(t.value)
+        return t
+
+    @_(r'"[^"]*"')
+    def STRING(self,t):
+        t.value = str(t.value)
+        return t
 
     def error(self, t):
         print('Line %d: Bad character %r' % (self.lineno, t.value[0]))
