@@ -99,13 +99,7 @@ class Scanner(Lexer):
         # exit(1)
         self.index += 1
 
-
-if __name__ == '__main__':
-
-    with open("example.txt", "r") as f:
-        data = f.read()
-
-    lexer = Scanner()
-    tokenized = lexer.tokenize((data))
-    for tok in tokenized:
-        print(f"({tok.lineno}): {tok.type}({tok.value})")
+    def input(self, data):
+        tokenized = self.tokenize((data))
+        for tok in tokenized:
+            print(f"({tok.lineno}): {tok.type}({tok.value})")
