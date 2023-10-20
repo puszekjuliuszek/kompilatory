@@ -2,14 +2,13 @@ from sly import Lexer
 
 class Scanner(Lexer):
     # Set of token names.   This is always required
-    tokens = {ADD, SUB, MUL, DIV,
-              DOTADD, DOTSUB, DOTMUL, DOTDIV,
+    tokens = {DOTADD, DOTSUB, DOTMUL, DOTDIV,
               ASSIGN, ADDASSIGN, SUBASSIGN, MULASSIGN, DIVASSIGN,
               GREATER, LESSER, GEATEREQUAL, LESSEREQUAL, NOTEQUAL, EQUAL,
-              BRACKETOPEN, BRACKETCLOSE, SQUAREBRACKETOPEN, SQUAREBRACKETCLOSE, CURLYBRACKETOPEN, CURLYBRACKETCLOSE,
-              COLON,
-              APOSTROPHE,
-              COMMA, SEMICOLON,
+              # BRACKETOPEN, BRACKETCLOSE, SQUAREBRACKETOPEN, SQUAREBRACKETCLOSE, CURLYBRACKETOPEN, CURLYBRACKETCLOSE,
+              # COLON,
+              # APOSTROPHE,
+              # COMMA, SEMICOLON,
               ID,
               IF, ELSE,
               WHILE, FOR,
@@ -22,22 +21,19 @@ class Scanner(Lexer):
     # String containing ignored characters between tokens
     ignore = ' \t'
     ignore_comment = r'\#.*'
+    literals = {'+', '-', '*', '/', '=','(', ')','[',']','{','}', ',', ';', '\'', ':'}
 
     @_(r'\n+')
     def ignore_newline(self, t):
         self.lineno += t.value.count('\n')
 
     # Regular expression rules for tokens
-    ADD = r'\+'
-    SUB = r'-'
-    MUL = r'\*'
-    DIV = r'/'
     EQUAL = r'=='
     DOTADD = r'\.\+'
     DOTSUB = r'\.-'
     DOTMUL = r'\.\*'
     DOTDIV = r'\./'
-    ASSIGN = r'='
+    # ASSIGN = r'='
     ADDASSIGN = r'\+='
     SUBASSIGN = r'-='
     MULASSIGN = r'\*='
@@ -47,16 +43,16 @@ class Scanner(Lexer):
     GEATEREQUAL = r'>='
     LESSEREQUAL = r'<='
     NOTEQUAL = r'!='
-    BRACKETOPEN = r'\('
-    BRACKETCLOSE = r'\)'
-    SQUAREBRACKETOPEN = r'\['
-    SQUAREBRACKETCLOSE = r'\]'
-    CURLYBRACKETOPEN = r'\{'
-    CURLYBRACKETCLOSE = r'\}'
-    COLON = r':'
-    APOSTROPHE = r'\''
-    COMMA = r','
-    SEMICOLON = r';'
+    # BRACKETOPEN = r'\('
+    # BRACKETCLOSE = r'\)'
+    # SQUAREBRACKETOPEN = r'\['
+    # SQUAREBRACKETCLOSE = r'\]'
+    # CURLYBRACKETOPEN = r'\{'
+    # CURLYBRACKETCLOSE = r'\}'
+    # COLON = r':'
+    # APOSTROPHE = r'\''
+    # COMMA = r','
+    # SEMICOLON = r';'
 
     # Base ID rule
     ID = r'[a-zA-Z_][a-zA-Z0-9_]*'
