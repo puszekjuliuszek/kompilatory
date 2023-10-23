@@ -5,10 +5,6 @@ class Scanner(Lexer):
     tokens = {DOTADD, DOTSUB, DOTMUL, DOTDIV,
               ASSIGN, ADDASSIGN, SUBASSIGN, MULASSIGN, DIVASSIGN,
               GREATER, LESSER, GEATEREQUAL, LESSEREQUAL, NOTEQUAL, EQUAL,
-              # BRACKETOPEN, BRACKETCLOSE, SQUAREBRACKETOPEN, SQUAREBRACKETCLOSE, CURLYBRACKETOPEN, CURLYBRACKETCLOSE,
-              # COLON,
-              # APOSTROPHE,
-              # COMMA, SEMICOLON,
               ID,
               IF, ELSE,
               WHILE, FOR,
@@ -33,7 +29,6 @@ class Scanner(Lexer):
     DOTSUB = r'\.-'
     DOTMUL = r'\.\*'
     DOTDIV = r'\./'
-    # ASSIGN = r'='
     ADDASSIGN = r'\+='
     SUBASSIGN = r'-='
     MULASSIGN = r'\*='
@@ -43,16 +38,6 @@ class Scanner(Lexer):
     GEATEREQUAL = r'>='
     LESSEREQUAL = r'<='
     NOTEQUAL = r'!='
-    # BRACKETOPEN = r'\('
-    # BRACKETCLOSE = r'\)'
-    # SQUAREBRACKETOPEN = r'\['
-    # SQUAREBRACKETCLOSE = r'\]'
-    # CURLYBRACKETOPEN = r'\{'
-    # CURLYBRACKETCLOSE = r'\}'
-    # COLON = r':'
-    # APOSTROPHE = r'\''
-    # COMMA = r','
-    # SEMICOLON = r';'
 
     # Base ID rule
     ID = r'[a-zA-Z_][a-zA-Z0-9_]*'
@@ -92,7 +77,6 @@ class Scanner(Lexer):
 
     def error(self, t):
         print('Line %d: Bad character %r' % (self.lineno, t.value[0]))
-        # exit(1)
         self.index += 1
 
     def input(self, data):
