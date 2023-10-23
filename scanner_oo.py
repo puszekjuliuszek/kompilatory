@@ -60,19 +60,20 @@ class Scanner(Lexer):
         t.value = str(t.value)
         return t
 
-    @_(r'\d+\.\d+')
+    @_(r'-?\d*\.\d+(E[-+]?\d+)?|\d+\.\d*(E[-+]?\d+)?')
     def FLOATNUM(self, t):
         t.value = float(t.value)
         return t
 
-    @_(r'\d+')
+    @_(r'-?\d+')
     def INTNUM(self, t):
         t.value = int(t.value)
         return t
 
-    @_(r'"[^"]*"')
-    def STRING(self,t):
+    @_(r'\"(\\.|[^\"])*\"')
+    def STRING(self, t):
         t.value = str(t.value)
+        t.value = t.value[1:-1].replace('\\"', '"')
         return t
 
     def error(self, t):
