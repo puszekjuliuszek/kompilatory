@@ -1,3 +1,3 @@
 from sly import Parser
 
-class Scanner(Parser):
+class CalcParser(Parser):
