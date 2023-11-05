@@ -3,8 +3,8 @@ from sly import Lexer
 class Scanner(Lexer):
     # Set of token names.   This is always required
     tokens = {DOTADD, DOTSUB, DOTMUL, DOTDIV,
-              ASSIGN, ADDASSIGN, SUBASSIGN, MULASSIGN, DIVASSIGN,
-              GREATER, LESSER, GEATEREQUAL, LESSEREQUAL, NOTEQUAL, EQUAL,
+                ADDASSIGN, SUBASSIGN, MULASSIGN, DIVASSIGN,
+              AND, OR, XOR, NOT,
               ID,
               IF, ELSE,
               WHILE, FOR,
@@ -17,14 +17,13 @@ class Scanner(Lexer):
     # String containing ignored characters between tokens
     ignore = ' \t'
     ignore_comment = r'\#.*'
-    literals = {'+', '-', '*', '/', '=','(', ')','[',']','{','}', ',', ';', '\'', ':'}
+    literals = {'+', '-', '*', '/', '=','(', ')','[',']','{','}', ',', ';', '\'', ':', '>', '<', '>=', '<=', '!=', '=='}
 
     @_(r'\n+')
     def ignore_newline(self, t):
         self.lineno += t.value.count('\n')
 
     # Regular expression rules for tokens
-    EQUAL = r'=='
     DOTADD = r'\.\+'
     DOTSUB = r'\.-'
     DOTMUL = r'\.\*'
@@ -33,11 +32,10 @@ class Scanner(Lexer):
     SUBASSIGN = r'-='
     MULASSIGN = r'\*='
     DIVASSIGN = r'/='
-    GREATER = r'>'
-    LESSER = r'<'
-    GEATEREQUAL = r'>='
-    LESSEREQUAL = r'<='
-    NOTEQUAL = r'!='
+    OR = r'OR'
+    AND = r'AND'
+    XOR = r'XOR'
+    NOT = r'NOT'
 
     # Base ID rule
     ID = r'[a-zA-Z_][a-zA-Z0-9_]*'
