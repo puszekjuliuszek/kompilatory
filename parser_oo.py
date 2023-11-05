@@ -7,6 +7,8 @@ class CalcParser(Parser):
     debugfile = 'parser.out'
 
     precedence = (
+        ('right', IFX),
+        ('right', ELSE),
         ('left', AND, OR, XOR),
         ('left', "+", "-"),
         ('left', "*", "/"),
@@ -89,6 +91,56 @@ class CalcParser(Parser):
     def mat_fun(self, p):
         return p
 
+# instrukcje warunkowe
+    @_('IF "(" expr ")" instruction %prec IFX',
+       'IF "(" expr ")" instruction ELSE instruction')
+    def if_i(self,p):
+        return p
+
+# pętle
+    @_('WHILE "(" expr ")" instruction')
+    def while_l(self,p):
+        return p
+
+    @_('FOR ID "=" expr ":" expr instruction')
+    def for_l(self,p):
+        return p
+
+# break continue i return
+    @_('RETURN',
+       'RETURN expr')
+    def return_i(self,p):
+        return p
+
+    @_('if_i',
+       'return_i ";"',
+       'BREAK ";"',
+       'CONTINUE ";"',
+       'for_l',
+       'while_l',
+       'assign ";"',
+       'print_i ";"',
+       '"{" instructions "}"')
+    def instructions(self,p):
+        return p
+
+# print
+    @_('PRINT printargs')
+    def print_i(self,p):
+        return p
+
+    @_('expr "," printargs',
+       'expr')
+    def printargs(self, p):
+        return p
+
+#tablice
+    @_('ID "[" expr "]"',
+       'ID "[" expr ":" expr "]"',
+       'ID "[" ":" expr "]"',
+       'ID "[" expr ":" "]"')
+    def array(self,p):
+        return p
 
 if __name__ == '__main__':
     lexer = Scanner()
