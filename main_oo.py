@@ -6,7 +6,7 @@ from sly.lex import LexError
 if __name__ == '__main__':
     scanner = Scanner()
     parser = CalcParser()
-    with open("example_3.txt", "r") as infile:
+    with open("example.txt", "r") as infile:
         source_code = infile.read()
         infile.close()
 

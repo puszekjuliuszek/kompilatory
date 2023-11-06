@@ -14,12 +14,10 @@ class CalcParser(Parser):
     precedence = (
         ('right', IFX),
         ('right', ELSE),
-        ('left', AND, OR, XOR),
-        ('left', "+", "-"),
-        ('left', "*", "/"),
-        ('left', DOTADD, DOTSUB),
-        ('left', DOTMUL, DOTDIV),
         ('nonassoc', GREATEREQUAL, LESSEREQUAL, GREATER, LESSER, NOTEQUAL, EQUAL),
+        ('left', AND, OR, XOR),
+        ('left', "+", "-", DOTADD, DOTSUB),
+        ('left', "*", "/", DOTMUL, DOTDIV),
         ('right', NOT, UMINUS),
     )
 
