@@ -1,15 +1,18 @@
 #object oriented version
-import scanner_oo
+from scanner_oo import Scanner
+from parser_oo import CalcParser
+from sly.lex import LexError
 
 if __name__ == '__main__':
+    scanner = Scanner()
+    parser = CalcParser()
+    with open("example_3.txt", "r") as infile:
+        source_code = infile.read()
+        infile.close()
 
-    with open("example.txt", "r") as f:
-        data = f.read()
-
-    lexer = scanner_oo.Scanner()
-
-    
-    # Give the lexer some input
-    lexer.input(data)
+    try:
+        parser.parse(Scanner().tokenize(source_code))
+    except LexError as e:
+        print(f"Lexer error: {e}")
 
 

@@ -1,5 +1,10 @@
 from sly import Parser
 from scanner_oo import Scanner
+from sly.lex import LexError
+
+def print_error(p, message):
+    p = p.error
+    print("Syntax error in {0}, at line {1}: LexToken({2}, '{3}')".format(message, p.lineno, p.type, p.value))
 
 class CalcParser(Parser):
     # Get the token list from the lexer (required)
@@ -14,7 +19,7 @@ class CalcParser(Parser):
         ('left', "*", "/"),
         ('left', DOTADD, DOTSUB),
         ('left', DOTMUL, DOTDIV),
-        ('nonassoc', GREATER, LESSER, GREATEREQUAL, LESSEREQUAL, NOTEQUAL, EQUAL),
+        ('nonassoc', GREATEREQUAL, LESSEREQUAL, GREATER, LESSER, NOTEQUAL, EQUAL),
         ('right', NOT, UMINUS),
     )
 
@@ -100,6 +105,8 @@ class CalcParser(Parser):
     def assign(self, p):
         return p
 
+
+
 #negacje
     @_('"-" expr %prec UMINUS',
        'NOT expr %prec NOT',
@@ -145,38 +152,26 @@ class CalcParser(Parser):
     def mat_fun(self, p):
         return p
 
-# instrukcje warunkowe
+# instrukcje wartunkowe
     @_('IF "(" expr ")" instruction %prec IFX',
        'IF "(" expr ")" instruction ELSE instruction')
-    def if_i(self,p):
+    def if_i(self, p):
         return p
 
-# pętle
+#pętle
     @_('WHILE "(" expr ")" instruction')
-    def while_l(self,p):
+    def while_l(self, p):
         return p
 
-    @_('FOR ID "=" expr ":" expr instruction')
-    def for_l(self,p):
+    @_('FOR ID "=" expr ":" expr instruction', )
+    def for_l(self, p):
         return p
 
 # break continue i return
     @_('RETURN',
        'RETURN expr')
-    def return_i(self,p):
+    def return_i(self, p):
         return p
-
-    # @_('if_i',
-    #    'return_i ";"',
-    #    'BREAK ";"',
-    #    'CONTINUE ";"',
-    #    'for_l',
-    #    'while_l',
-    #    'assign ";"',
-    #    'print_i ";"',
-    #    '"{" instructions "}"')
-    # def instructions(self,p):
-    #     return p
 
 # print
     @_('PRINT printargs')
@@ -197,13 +192,13 @@ class CalcParser(Parser):
         return p
 
 if __name__ == '__main__':
-    lexer = Scanner()
+    scanner = Scanner()
     parser = CalcParser()
+    with open("example_3.txt", "r") as infile:
+        source_code = infile.read()
+        infile.close()
 
-    with open("example.txt", "r") as f:
-        data = f.read()
-
-    # Give the lexer some input
-    # lexer.input(data)
-    result = parser.parse(lexer.tokenize(" 12.2 + 432"))
-    print(result)
+    try:
+        parser.parse(scanner.tokenize(source_code))
+    except LexError as e:
+        print(f"Lexer error: {e}")

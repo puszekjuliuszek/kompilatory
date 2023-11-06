@@ -1,5 +1,6 @@
 from sly import Lexer
 
+
 class Scanner(Lexer):
     # Set of token names.   This is always required
     tokens = {DOTADD, DOTSUB, DOTMUL, DOTDIV,
@@ -33,10 +34,10 @@ class Scanner(Lexer):
     SUBASSIGN = r'-='
     MULASSIGN = r'\*='
     DIVASSIGN = r'/='
-    GREATER = '>'
-    LESSER = '<'
     GREATEREQUAL = '>='
     LESSEREQUAL = '<='
+    GREATER = '>'
+    LESSER = '<'
     NOTEQUAL = '!='
     EQUAL = '=='
 
