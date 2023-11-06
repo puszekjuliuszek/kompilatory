@@ -12,12 +12,13 @@ class Scanner(Lexer):
               RETURN,
               EYE, ZEROS, ONES,
               PRINT,
-              FLOATNUM, INTNUM, STRING}
+              FLOATNUM, INTNUM, STRING,
+              GREATER, LESSER, GREATEREQUAL, LESSEREQUAL, NOTEQUAL, EQUAL}
 
     # String containing ignored characters between tokens
     ignore = ' \t'
     ignore_comment = r'\#.*'
-    literals = {'+', '-', '*', '/', '=','(', ')','[',']','{','}', ',', ';', '\'', ':', '>', '<', '>=', '<=', '!=', '=='}
+    literals = {'+', '-', '*', '/', '=','(', ')','[',']','{','}', ',', ';', '\'', ':'}
 
     @_(r'\n+')
     def ignore_newline(self, t):
@@ -32,10 +33,13 @@ class Scanner(Lexer):
     SUBASSIGN = r'-='
     MULASSIGN = r'\*='
     DIVASSIGN = r'/='
-    OR = r'OR'
-    AND = r'AND'
-    XOR = r'XOR'
-    NOT = r'NOT'
+    GREATER = '>'
+    LESSER = '<'
+    GREATEREQUAL = '>='
+    LESSEREQUAL = '<='
+    NOTEQUAL = '!='
+    EQUAL = '=='
+
 
     # Base ID rule
     ID = r'[a-zA-Z_][a-zA-Z0-9_]*'
@@ -52,6 +56,10 @@ class Scanner(Lexer):
     ID['zeros'] = ZEROS
     ID['ones'] = ONES
     ID['print'] = PRINT
+    ID['and'] = AND
+    ID['or'] = OR
+    ID['xor'] = XOR
+    ID['not'] = NOT
 
     @_(r'[a-zA-Z_][a-zA-Z0-9_]*')
     def ID(self, t):
