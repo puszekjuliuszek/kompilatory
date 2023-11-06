@@ -14,26 +14,79 @@ class CalcParser(Parser):
         ('left', "*", "/"),
         ('left', DOTADD, DOTSUB),
         ('left', DOTMUL, DOTDIV),
-        ('nonassoc', "<=", ">=", "==", "!=", "<", ">"),
-        ('right', NOT, "-"),
+        ('nonassoc', GREATER, LESSER, GREATEREQUAL, LESSEREQUAL, NOTEQUAL, EQUAL),
+        ('right', NOT, UMINUS),
     )
+
+    start = 'program'
+
+    @_('instructions_or_empty')
+    def program(self, p):
+        return p
+
+    @_('instructions')
+    def instructions_or_empty(self, p):
+        return p
+
+    @_('')
+    def instructions_or_empty(self, p):
+        return p
+
+    @_('instructions instruction',
+       'instruction')
+    def instructions(self, p):
+        return p
+
+    @_('if_i',
+       'return_i ";"',
+       'BREAK ";"',
+       'CONTINUE ";"',
+       'for_l',
+       'while_l',
+       'assign ";"',
+       'print_i ";"',
+       '"{" instructions "}"')
+    def instruction(self, p):
+        return p
+
+    @_('var',
+       '"(" expr ")"',
+       'INTNUM',
+       'FLOATNUM',
+       'STRING')
+    def expr(self, p):
+        return p
+
+    @_('ID',
+       'matel')
+    def var(self, p):
+        return p
+
+    @_('ID "[" expr "," expr "]"')
+    def matel(self, p):
+        return p
+
 # operatory relacyjne, operacje arytmetyczne i element po elemencie
     @_('expr "+" expr',
        'expr "-" expr',
        'expr "*" expr',
        'expr "/" expr',
 
-       'expr "==" expr',
-       'expr "!=" expr',
-       'expr ">" expr',
-       'expr "<" expr',
-       'expr ">=" expr',
-       'expr "<=" expr',
+       'expr EQUAL expr',
+       'expr NOTEQUAL expr',
+       'expr GREATER expr',
+       'expr LESSER expr',
+       'expr GREATEREQUAL expr',
+       'expr LESSEREQUAL expr',
 
        'expr DOTMUL expr',
        'expr DOTDIV expr',
        'expr DOTADD expr',
        'expr DOTSUB expr',
+
+       'expr XOR expr',
+       'expr AND expr',
+       'expr OR expr'
        )
     def expr(self, p):
         return p
@@ -41,17 +94,18 @@ class CalcParser(Parser):
 #przypisania
     @_('var "=" expr',
        'var ADDASSIGN expr',
-       'var UBASSIGN expr',
+       'var SUBASSIGN expr',
        'var MULASSIGN expr',
        'var DIVASSIGN expr')
     def assign(self, p):
         return p
 
 #negacje
-    @_('NOT expr',
+    @_('"-" expr %prec UMINUS',
+       'NOT expr %prec NOT',
        '''expr "'"''')
     def expr(self, p):
-        return p
+        return p  # -p.expr
 
 #reprezewntacja macierzy
     @_('matrix')
@@ -112,17 +166,17 @@ class CalcParser(Parser):
     def return_i(self,p):
         return p
 
-    @_('if_i',
-       'return_i ";"',
-       'BREAK ";"',
-       'CONTINUE ";"',
-       'for_l',
-       'while_l',
-       'assign ";"',
-       'print_i ";"',
-       '"{" instructions "}"')
-    def instructions(self,p):
-        return p
+    # @_('if_i',
+    #    'return_i ";"',
+    #    'BREAK ";"',
+    #    'CONTINUE ";"',
+    #    'for_l',
+    #    'while_l',
+    #    'assign ";"',
+    #    'print_i ";"',
+    #    '"{" instructions "}"')
+    # def instructions(self,p):
+    #     return p
 
 # print
     @_('PRINT printargs')
@@ -139,7 +193,7 @@ class CalcParser(Parser):
        'ID "[" expr ":" expr "]"',
        'ID "[" ":" expr "]"',
        'ID "[" expr ":" "]"')
-    def array(self,p):
+    def vector(self,p):
         return p
 
 if __name__ == '__main__':
