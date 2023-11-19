@@ -1,6 +1,7 @@
 from sly import Parser
 from scanner_oo import Scanner
 from sly.lex import LexError
+import ast_tree
 
 def print_error(p, message):
     p = p.error
@@ -119,16 +120,16 @@ class CalcParser(Parser):
 
     @_('"[" vectors "]"')
     def matrix(self, p):
-        return p
+        return ast_tree.Matrix(p[1])
 
     @_('vectors "," vector',
        'vector')
     def vectors(self, p):
-        return p
+        return p[0] + [p[2]] if len(p) == 3 else [p[0]]
 
     @_('"[" variables "]"')
     def vector(self, p):
-        return p
+        return p[1]
 
     @_('variables "," variable',
        'variable')
@@ -142,13 +143,13 @@ class CalcParser(Parser):
 # macierzowe funkcje specjalne
     @_('mat_fun "(" expr ")"')
     def expr(self, p):
-        return p
+        return ast_tree.MatrixFunc(p[0], p[2])
 
     @_('ZEROS',
        'EYE',
        'ONES')
     def mat_fun(self, p):
-        return p
+        return p[0]
 
 # instrukcje wartunkowe
     @_('IF "(" expr ")" instruction %prec IFX',
@@ -179,7 +180,7 @@ class CalcParser(Parser):
     @_('expr "," printargs',
        'expr')
     def printargs(self, p):
-        return p
+        return [p[0]] + p[2] if len(p) == 3 else [p[0]]
 
 #tablice
     @_('ID "[" expr "]"',
@@ -197,6 +198,7 @@ if __name__ == '__main__':
         infile.close()
 
     try:
-        parser.parse(scanner.tokenize(source_code))
+        res = parser.parse(scanner.tokenize(source_code))
+        res.printTree
     except LexError as e:
         print(f"Lexer error: {e}")

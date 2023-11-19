@@ -2,6 +2,7 @@
 from scanner_oo import Scanner
 from parser_oo import CalcParser
 from sly.lex import LexError
+from tree_printer import TreePrinter
 
 if __name__ == '__main__':
     scanner = Scanner()
