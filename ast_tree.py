@@ -22,8 +22,6 @@ class Continue(Node):
 class Print(Node):
     printargs: Any
 
-#CZYM JEST INSTRUKCJA ZLOZONA XD
-
 @dataclass
 class Transpose(Node):
     val: Any

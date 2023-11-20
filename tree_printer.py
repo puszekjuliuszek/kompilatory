@@ -173,7 +173,7 @@ class TreePrinter:
         self.expr.printTree(i + 1)
 
 if __name__ == "__main__":
-    file_list = ["example.txt"]
+    file_list = ["example_3.txt"]
     parser = CalcParser()
     for filename in file_list:
         # if filename != "test_5.txt": continue
