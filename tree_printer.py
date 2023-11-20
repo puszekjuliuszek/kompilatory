@@ -75,10 +75,6 @@ class TreePrinter:
     @addToClass(ast_tree.Instructions)
     def printTree(self, indent=0):
         for instruction in self.instructions:
-            # print(instruction)
-            # print(self.instructions)
-            # print(instruction)
-            # print(instruction, type(instruction))
             instruction.printTree(indent)
 
     @addToClass(ast_tree.If)
@@ -177,7 +173,7 @@ class TreePrinter:
         self.expr.printTree(i + 1)
 
 if __name__ == "__main__":
-    file_list = ["example_1.txt"]
+    file_list = ["example.txt"]
     parser = CalcParser()
     for filename in file_list:
         # if filename != "test_5.txt": continue
