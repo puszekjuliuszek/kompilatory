@@ -26,20 +26,20 @@ class CalcParser(Parser):
 
     start = 'program'
 
-    @_('instructions_or_empty')
+    @_('instructions')
     def program(self, p):
         if self.had_error:
             self.had_error = False
             return None
-        return AST.InstrOrEmpty(p[0])
-
-    @_('instructions')
-    def instructions_or_empty(self, p):
         return AST.Instructions(p[0])
 
-    @_('')
-    def instructions_or_empty(self, p):
-        return AST.Instructions()
+    # @_('instructions')
+    # def instructions_or_empty(self, p):
+    #     return AST.Instructions(p[0])
+
+    # @_('')
+    # def instructions_or_empty(self, p):
+    #     return AST.Instructions()
 
     @_('instructions instruction',
        'instruction')

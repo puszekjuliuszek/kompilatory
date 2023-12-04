@@ -124,9 +124,9 @@ class NodeVisitor(object):
 
 class TypeChecker(NodeVisitor):
 
-    def visit_InstrOrEmpty(self, node: AST.InstrOrEmpty):
-        self.visit(node.instructions)
-        # print(self.symbol_table.symbols)
+    # def visit_InstrOrEmpty(self, node: AST.InstrOrEmpty):
+    #     self.visit(node.instructions)
+    #     # print(self.symbol_table.symbols)
 
     def visit_Instructions(self, node: AST.Instructions):
         for instruction in node.instructions:

@@ -7,10 +7,10 @@ class Node(object):
         print(indent * "|\t", end="")
 
 
-@dataclass
-class InstrOrEmpty(Node):
-    instructions: Any = None
-    lineno: Any = 0
+# @dataclass
+# class InstrOrEmpty(Node):
+#     instructions: Any = None
+#     lineno: Any = 0
 
 
 @dataclass
