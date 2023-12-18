@@ -1,10 +1,5 @@
-import os
-
-from sly.lex import LexError
-
-from scanner_oo import Scanner
-from parser_oo import CalcParser
-import ast_tree
+# from __future__ import print_function
+import ast_tree as AST
 
 def addToClass(cls):
 
@@ -15,178 +10,197 @@ def addToClass(cls):
 
 class TreePrinter:
 
-    @addToClass(ast_tree.Node)
+    @addToClass(AST.Node)
     def printTree(self, indent=0):
         raise Exception("printTree not defined in class " + self.__class__.__name__)
 
-    @addToClass(ast_tree.Return)
+
+    # @addToClass(AST.InstrOrEmpty)
+    # def printTree(self, indent=0):
+    #     self.instructions.printTree(indent)
+
+    # @addToClass(AST.Instructions)
+    # def printTree(self,i):
+
+
+    @addToClass(AST.Instructions)
+    def printTree(self, indent=0):
+        for instruction in self.instructions:
+            # print(instruction)
+            # print(self.instructions)
+            # print(instruction)
+            # print(instruction, type(instruction))
+            instruction.printTree(indent)
+
+    @addToClass(AST.If)
+    def printTree(self, indent):
+        self.print_indent(indent)
+        print("IF")
+        self.cond.printTree(indent+1)
+        self.print_indent(indent)
+        print("THEN")
+        # for x in self.if_body:
+        #     x.printTree(indent+1)
+        self.if_body.printTree(indent+1)
+        if self.else_body is not None:
+            self.print_indent(indent)
+            print("ELSE")
+            # for x in self.else_body:
+            #     x.printTree(indent+1)
+            self.else_body.printTree(indent+1)
+
+
+    @addToClass(AST.Return)
     def printTree(self, indent):
         self.print_indent(indent)
         print("RETURN")
         if self.expr is not None:
             self.expr.printTree(indent+1)
 
-    @addToClass(ast_tree.Break)
+    @addToClass(AST.Break)
     def printTree(self, i):
         self.print_indent(i)
         print("BREAK")
 
-    @addToClass(ast_tree.Continue)
+    @addToClass(AST.Continue)
     def printTree(self, i):
         self.print_indent(i)
         print("CONTINUE")
 
-    @addToClass(ast_tree.Print)
+    @addToClass(AST.For)
+    def printTree(self, i):
+        self.print_indent(i)
+        print("FOR")
+        self.id.printTree(i+1)
+        self.print_indent(i+1)
+        print("RANGE")
+        self.cond_start.printTree(i+2)
+        self.cond_end.printTree(i+2)
+        self.body.printTree(i+1)
+
+    @addToClass(AST.While)
+    def printTree(self, i):
+        self.print_indent(i)
+        print("WHILE")
+        self.cond.printTree(i+1)
+        self.body.printTree(i+1)
+
+
+    @addToClass(AST.AssignOp)
+    def printTree(self, i):
+        self.print_indent(i)
+        print(self.op)
+        self.left.printTree(i+1)
+        self.right.printTree(i+1)
+
+    @addToClass(AST.Print)
     def printTree(self, i):
         self.print_indent(i)
         print("PRINT")
         for printarg in self.printargs:
+            # self.print_indent(1+i)
+            # print(printarg)
             printarg.printTree(i+1)
 
-    @addToClass(ast_tree.Transpose)
-    def printTree(self, i):
-        self.print_indent(i)
-        print("TRANSPOSE")
-        self.val.printTree(i + 1)
 
-    @addToClass(ast_tree.Matrix)
-    def printTree(self, i):
-        self.print_indent(i)
-        print("VECTOR")
-        for row in self.matrix:
-            self.print_indent(i + 1)
-            print("VECTOR")
-            for expr in row:
-                expr.printTree(i+2)
 
-    @addToClass(ast_tree.MatrixFunc)
-    def printTree(self, i):
-        self.print_indent(i)
-        print(self.func)
-        self.expr.printTree(i+1)
-
-    @addToClass(ast_tree.InstrOrEmpty)
-    def printTree(self, indent=0):
-        self.instructions.printTree(indent)
-
-    # @addToClass(AST.Instructions)
-    # def printTree(self,i):
-
-    @addToClass(ast_tree.Instructions)
-    def printTree(self, indent=0):
-        for instruction in self.instructions:
-            instruction.printTree(indent)
-
-    @addToClass(ast_tree.If)
-    def printTree(self, indent):
-        self.print_indent(indent)
-        print("IF")
-        self.cond.printTree(indent + 1)
-        self.print_indent(indent)
-        print("THEN")
-        # for x in self.if_body:
-        #     x.printTree(indent+1)
-        self.if_body.printTree(indent + 1)
-        if self.else_body is not None:
-            self.print_indent(indent)
-            print("ELSE")
-            # for x in self.else_body:
-            #     x.printTree(indent+1)
-            self.else_body.printTree(indent + 1)
-
-    @addToClass(ast_tree.While)
-    def printTree(self, i):
-        self.print_indent(i)
-        print("WHILE")
-        self.cond.printTree(i + 1)
-        self.body.printTree(i + 1)
-
-    @addToClass(ast_tree.AssignOp)
-    def printTree(self, i):
-        self.print_indent(i)
-        print(self.op)
-        self.left.printTree(i + 1)
-        self.right.printTree(i + 1)
-
-    @addToClass(ast_tree.String)
+    @addToClass(AST.String)
     def printTree(self, i):
         self.print_indent(i)
         print("STRING")
-        self.print_indent(i + 1)
+        self.print_indent(i+1)
         print(self.string)
 
-    @addToClass(ast_tree.IntNum)
-    def printTree(self, i):
+    @addToClass(AST.IntNum)
+    def printTree(self, i ):
         # self.print_indent(i)
         # print("INTNUM")
         # self.print_indent(i+1)s
         self.print_indent(i)
         print(self.intnum)
 
-    @addToClass(ast_tree.FloatNum)
-    def printTree(self, i):
+
+    @addToClass(AST.FloatNum)
+    def printTree(self, i ):
         self.print_indent(i)
         print("FLOATNUM")
-        self.print_indent(i + 1)
+        self.print_indent(i+1)
         print(self.floatnum)
 
-    @addToClass(ast_tree.Variable)
+
+    @addToClass(AST.Variable)
     def printTree(self, i):
 
         if self.index is not None:
             self.print_indent(i)
             print("REF")
-            self.id.printTree(i + 1)
+            self.id.printTree(i+1)
+
 
             for e in self.index:
                 # self.print_indent(i+2)
-                e.printTree(i + 1)
+                e.printTree(i+1)
 
-    @addToClass(ast_tree.Id)
+
+    @addToClass(AST.Id)
     def printTree(self, i):
         self.print_indent(i)
         print(self.id)
 
-    @addToClass(ast_tree.BinExpr)
+    @addToClass(AST.BinExpr)
     def printTree(self, i):
         self.print_indent(i)
         print(self.op)
-        self.left.printTree(i + 1)
-        self.right.printTree(i + 1)
+        self.left.printTree(i+1)
+        self.right.printTree(i+1)
 
-    @addToClass(ast_tree.Uminus)
+
+    @addToClass(AST.Uminus)
     def printTree(self, i):
         self.print_indent(i)
         print("-")
-        self.val.printTree(i + 1)
+        self.val.printTree(i+1)
 
-    @addToClass(ast_tree.Uneg)
+    @addToClass(AST.Uneg)
     def printTree(self, i):
         self.print_indent(i)
         print("NOT")
         self.val.printTree(i + 1)
 
-    @addToClass(ast_tree.Unary)
+    @addToClass(AST.Transpose)
+    def printTree(self, i):
+        self.print_indent(i)
+        print("TRANSPOSE")
+        self.val.printTree(i + 1)
+
+    @addToClass(AST.Unary)
     def printTree(self, i):
         self.print_indent(i)
         print(self.operation)
-        self.expr.printTree(i + 1)
+        self.expr.printTree(i+1)
 
-if __name__ == "__main__":
-    file_list = ["example_3.txt"]
-    parser = CalcParser()
-    for filename in file_list:
-        # if filename != "test_5.txt": continue
-        file_path = os.path.join(filename)
 
-        if os.path.isfile(file_path):
-            with open(file_path, 'r') as file:
-                file_contents = file.read()
-                print(f'Testing {filename}:')
-            try:
-                cos = parser.parse(Scanner().tokenize(file_contents))
-                if cos is not None:
-                    cos.printTree(0)
+    @addToClass(AST.Matrix)
+    def printTree(self, i):
+        self.print_indent(i)
+        print("VECTOR")
+        for row in self.matrix:
+            row.printTree(i + 1)
 
-            except LexError as e:
-                print(f"Lexer error: {e}")
+
+    @addToClass(AST.Vector)
+    def printTree(self, i):
+        self.print_indent(i)
+        print("VECTOR")
+        for expr in self.vector:
+            expr.printTree(i + 1)
+
+
+    @addToClass(AST.MatrixFunc)
+    def printTree(self, i):
+        self.print_indent(i)
+        print(self.func)
+        # print(self.expr)
+        for el in self.dims:
+            el.printTree(i+1)
+        # self.expr.printTree(i+1)
