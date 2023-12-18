@@ -2,7 +2,6 @@ from scanner_oo import Scanner
 from sly import Parser
 import ast_tree as AST
 
-
 def print_error(p, message):
     p = p.error
     print("Syntax error in {0}, at line {1}: LexToken({2}, '{3}')".format(message, p.lineno, p.type, p.value))
@@ -15,31 +14,37 @@ class CalcParser(Parser):
 
     # Priorytety operacji
     precedence = (
+
         ('right', IFX),
         ('right', ELSE),
-        ('nonassoc', GREATEREQUAL, LESSEREQUAL, GREATER, LESSER, NOTEQUAL, EQUAL),
         ('left', AND, OR, XOR),
-        ('left', "+", "-", DOTADD, DOTSUB),
-        ('left', "*", "/", DOTMUL, DOTDIV),
-        ('right', NOT, UMINUS),
+        ('right', "=", MULTIPLYASSIGN, DIVIDEASSIGN, MINUSASSIGN, PLUSASSIGN),
+        ('left', "+", "-"),
+        ('left', "*", "/"),
+        ('left', DOTPLUS, DOTMINUS),
+        ('left', DOTMULTIPLY, DOTDIVIDE),
+        ('nonassoc', LTE, GTE, EQ, NEQ, LT, GT),
+        ('left', "\'"),
+        ('right', UNEG, UMINUS),
+
     )
 
     start = 'program'
 
-    @_('instructions')
+    @_('instructions_or_empty')
     def program(self, p):
         if self.had_error:
             self.had_error = False
             return None
+        return AST.InstrOrEmpty(p[0])
+
+    @_('instructions')
+    def instructions_or_empty(self, p):
         return AST.Instructions(p[0])
 
-    # @_('instructions')
-    # def instructions_or_empty(self, p):
-    #     return AST.Instructions(p[0])
-
-    # @_('')
-    # def instructions_or_empty(self, p):
-    #     return AST.Instructions()
+    @_('')
+    def instructions_or_empty(self, p):
+        return AST.Instructions()
 
     @_('instructions instruction',
        'instruction')
@@ -97,6 +102,9 @@ class CalcParser(Parser):
     def for_l(self, p):
         return AST.For(AST.Id(p[1]), p[3], p[5], AST.Instructions(p[6]), p.lineno)
 
+
+
+
     @_('FOR ID "=" error ":" expr instruction',
        'FOR ID "=" expr ":" error instruction',
        'FOR ID "=" expr ":" expr error')
@@ -153,23 +161,35 @@ class CalcParser(Parser):
     def var(self, p):
         return AST.Id(p[0])
 
-    @_('ID "[" mat_fun_args "]"')
+    @_('ID "[" mat_ref_args "]"')
     def matel(self, p):
         return AST.Variable(AST.Id(p[0]), p[2], p.lineno)
 
+    @_("mat_ref_args ',' expr",
+       "expr")
+    def mat_ref_args(self, p):
+        return [p[0]] if len(p) == 1 else p[0] + [p[2]]
+
+    @_("mat_ref_args ',' expr ':' expr",
+       "expr ':' expr")
+    def mat_ref_args(self, p):
+        return [(p[0], p[2])] if len(p) == 3 else p[0] + [(p[2], p[4])]
+
+
+
     @_('var "=" expr',
-       'var ADDASSIGN expr',
-       'var SUBASSIGN expr',
-       'var MULASSIGN expr',
-       'var DIVASSIGN expr')
+       'var PLUSASSIGN expr',
+       'var MINUSASSIGN expr',
+       'var MULTIPLYASSIGN expr',
+       'var DIVIDEASSIGN expr')
     def assign(self, p):
         return AST.AssignOp(p[0],p[1], p[2], p.lineno)
 
     @_('var "=" error',
-       'var ADDASSIGN error',
-       'var SUBASSIGN error',
-       'var MULASSIGN error',
-       'var DIVASSIGN error')
+       'var PLUSASSIGN error',
+       'var MINUSASSIGN error',
+       'var MULTIPLYASSIGN error',
+       'var DIVIDEASSIGN error')
     def assign(self, p):
         print_error(p, "assigment")
 
@@ -181,9 +201,9 @@ class CalcParser(Parser):
     def unary(self, p):
         return AST.Unary("UMINUS", p[1], p.lineno)
 
-    @_('NOT expr %prec NOT')
+    @_('NOT expr %prec UNEG')
     def unary(self, p):
-        return AST.Unary("NOT", p[1], p.lineno)
+        return AST.Unary("UNEG", p[1], p.lineno)
 
     @_('expr "\'"')
     def unary(self, p):
@@ -195,21 +215,21 @@ class CalcParser(Parser):
        'expr "*" expr',
        'expr "/" expr',
 
-       'expr EQUAL expr',
-       'expr NOTEQUAL expr',
-       'expr LESSER expr',
-       'expr GREATER expr',
-       'expr LESSEREQUAL expr',
-       'expr GREATEREQUAL expr',
+       'expr EQ expr',
+       'expr NEQ expr',
+       'expr LT expr',
+       'expr GT expr',
+       'expr LTE expr',
+       'expr GTE expr',
 
        'expr XOR expr',
        'expr AND expr',
        'expr OR expr',
 
-       'expr DOTMUL expr',
-       'expr DOTDIV expr',
-       'expr DOTADD expr',
-       'expr DOTSUB expr')
+       'expr DOTMULTIPLY expr',
+       'expr DOTDIVIDE expr',
+       'expr DOTPLUS expr',
+       'expr DOTMINUS expr')
     def expr(self, p):
         return AST.BinExpr(p[0], p[1], p[2], p.lineno)
 
@@ -252,6 +272,8 @@ class CalcParser(Parser):
        "expr")
     def mat_fun_args(self, p):
         return [p[0]] if len(p) == 1 else p[0] + [p[2]]
+
+
 
     @_('mat_fun "(" error ")"')
     def expr(self, p):

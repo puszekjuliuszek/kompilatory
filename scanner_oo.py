@@ -1,55 +1,86 @@
 from sly import Lexer
 
-
 class Scanner(Lexer):
-    # Set of token names.   This is always required
-    tokens = {DOTADD, DOTSUB, DOTMUL, DOTDIV,
-                ADDASSIGN, SUBASSIGN, MULASSIGN, DIVASSIGN,
-              AND, OR, XOR, NOT,
-              ID,
-              IF, ELSE,
-              WHILE, FOR,
-              BREAK, CONTINUE,
-              RETURN,
-              EYE, ZEROS, ONES,
-              PRINT,
-              FLOATNUM, INTNUM, STRING,
-              GREATER, LESSER, GREATEREQUAL, LESSEREQUAL, NOTEQUAL, EQUAL}
+    tokens = {
+        DOTPLUS, DOTMINUS, DOTMULTIPLY, DOTDIVIDE,
+        PLUSASSIGN, MINUSASSIGN, MULTIPLYASSIGN, DIVIDEASSIGN,
+        # PLUS, MINUS, MULTIPLY, DIVIDE, ASSIGN,
+        LT, GT, LTE, GTE, EQ, NEQ,
+        IF, ELSE, FOR, WHILE,
+        AND, OR, XOR, NOT,
+        BREAK, CONTINUE, RETURN,
+        EYE, ZEROS, ONES,
+        PRINT,
+        ID,
+        INTNUM,
+        FLOATNUM,
+        STRING
+    }
 
-    # String containing ignored characters between tokens
+    literals = {
+                '+', '-', '*', '/',
+                '=',
+                '(', ')', '[', ']', '{', '}',
+                ':',
+                '\'',
+                ';', ','}
+
     ignore = ' \t'
     ignore_comment = r'\#.*'
-    literals = {'+', '-', '*', '/', '=','(', ')','[',']','{','}', ',', ';', '\'', ':'}
 
     @_(r'\n+')
     def ignore_newline(self, t):
-        self.lineno += t.value.count('\n')
-
-    # Regular expression rules for tokens
-    DOTADD = r'\.\+'
-    DOTSUB = r'\.-'
-    DOTMUL = r'\.\*'
-    DOTDIV = r'\./'
-    ADDASSIGN = r'\+='
-    SUBASSIGN = r'-='
-    MULASSIGN = r'\*='
-    DIVASSIGN = r'/='
-    GREATEREQUAL = '>='
-    LESSEREQUAL = '<='
-    GREATER = '>'
-    LESSER = '<'
-    NOTEQUAL = '!='
-    EQUAL = '=='
+        self.lineno += len(t.value)
 
 
-    # Base ID rule
-    ID = r'[a-zA-Z_][a-zA-Z0-9_]*'
 
-    # Special cases
+    FLOATNUM = r'((\d+\.(\d*)?|\.\d+)([eE][-+]?\d+)?|(\d+[eE][-+]?\d+))'
+    INTNUM = r'(\d+)'
+    STRING = r'\"[^\"]*\"'
+
+    def FLOATNUM(self, t):
+        t.value = float(t.value)
+        return t
+
+    def INTNUM(self, t):
+        t.value = int(t.value)
+        return t
+
+    def STRING(self, t):
+        t.value = str(t.value)[1:-1]
+
+        return t
+
+
+    DOTPLUS = r'\.\+'
+    DOTMINUS = r'\.-'
+    DOTMULTIPLY = r'\.\*'
+    DOTDIVIDE = r'\./'
+
+    PLUSASSIGN = r'\+='
+    MINUSASSIGN = r'-='
+    MULTIPLYASSIGN = r'\*='
+    DIVIDEASSIGN = r'/='
+
+    # PLUS = r'\+'
+    # MINUS = r'-'
+    # MULTIPLY = r'\*'
+    # DIVIDE = r'/'
+    # ASSIGN = r'='
+
+    LTE = r'<='
+    GTE = r'>='
+    EQ = r'=='
+    NEQ = r'!='
+    LT = r'<'
+    GT = r'>'
+
+
+    ID = r'[A-Za-z_][A-Za-z0-9_]*'
     ID['if'] = IF
     ID['else'] = ELSE
-    ID['while'] = WHILE
     ID['for'] = FOR
+    ID['while'] = WHILE
     ID['break'] = BREAK
     ID['continue'] = CONTINUE
     ID['return'] = RETURN
@@ -62,32 +93,6 @@ class Scanner(Lexer):
     ID['xor'] = XOR
     ID['not'] = NOT
 
-    @_(r'[a-zA-Z_][a-zA-Z0-9_]*')
-    def ID(self, t):
-        t.value = str(t.value)
-        return t
-
-    @_(r'\d*\.\d+(E[-+]?\d+)?|\d+\.\d*(E[-+]?\d+)?')
-    def FLOATNUM(self, t):
-        t.value = float(t.value)
-        return t
-
-    @_(r'\d+')
-    def INTNUM(self, t):
-        t.value = int(t.value)
-        return t
-
-    @_(r'\"(\\.|[^\"])*\"')
-    def STRING(self, t):
-        t.value = str(t.value)
-        t.value = t.value[1:-1].replace('\\"', '"')
-        return t
-
     def error(self, t):
-        print('Line %d: Bad character %r' % (self.lineno, t.value[0]))
+        print(f"({t.lineno}) illegal character '{t.value[0]}'")
         self.index += 1
-
-    def input(self, data):
-        tokenized = self.tokenize((data))
-        for tok in tokenized:
-            print(f"({tok.lineno}): {tok.type}({tok.value})")

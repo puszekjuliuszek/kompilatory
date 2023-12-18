@@ -73,16 +73,16 @@ class Interpreter(object):
     def visit(self, node):
         pass
 
-    @when(AST.Instructions)
+    @when(AST.InstrOrEmpty)
     def visit(self, node: AST.Instructions):
         self.memory = MemoryStack()
         self.memory.push('global')
+        node.instructions.accept(self)
+
+    @when(AST.Instructions)
+    def visit(self, node: AST.Instructions):
         for instruction in node.instructions:
             instruction.accept(self)
-
-    # @when(AST.Instructions)
-    # def visit(self, node: AST.Instructions):
-
 
     @when(AST.BinExpr)
     def visit(self, node: AST.BinExpr):

@@ -22,9 +22,7 @@ dict_of_types["*"]["int"]["int"] = "int"
 dict_of_types["*"]["int"]["float"] = "float"
 dict_of_types["*"]["float"]["int"] = "float"
 dict_of_types["*"]["float"]["float"] = "float"
-# dict_of_types["*"]["str"]["str"] = "str"
-dict_of_types["*"]["str"]["int"] = "str"
-dict_of_types["*"]["int"]["str"] = "str"
+dict_of_types["*"]["str"]["str"] = "str"
 dict_of_types["*"]["vector"]["vector"] = "vector"
 
 dict_of_types["/"]["int"]["int"] = "int"
@@ -124,9 +122,9 @@ class NodeVisitor(object):
 
 class TypeChecker(NodeVisitor):
 
-    # def visit_InstrOrEmpty(self, node: AST.InstrOrEmpty):
-    #     self.visit(node.instructions)
-    #     # print(self.symbol_table.symbols)
+    def visit_InstrOrEmpty(self, node: AST.InstrOrEmpty):
+        self.visit(node.instructions)
+        # print(self.symbol_table.symbols)
 
     def visit_Instructions(self, node: AST.Instructions):
         for instruction in node.instructions:
@@ -192,7 +190,7 @@ class TypeChecker(NodeVisitor):
             # print()
             # print(node.lineno, left_dims, right_dims)
             if len(right_dims) != len(left_dims):
-                print(f"{node.lineno} Nonequal vector dim ")
+                print(f"{node.lineno} Nonequal vector dim")
                 return None
 
             for i in range(len(right_dims)):
@@ -207,7 +205,7 @@ class TypeChecker(NodeVisitor):
 
                 if ldi != rdi:
                     # print(left_dims[i], right_dims[i])
-                    print(f"{node.lineno} Nonequal vector dim  {rdi}  {ldi}")
+                    print(f"{node.lineno} Nonequal vector dim")
                     return None
             node.dims = left_dims
         return dict_of_types[op][type1][type2]
@@ -361,13 +359,25 @@ class TypeChecker(NodeVisitor):
         # print(node.index)
         # print(dims)
         for i in range(len(node.index)):
-            if self.visit(node.index[i]) != 'int':
-                print(f"{node.lineno} Vector index must be int")
-                return None
+            if isinstance(node.index[i], tuple):
+                if self.visit(node.index[i][0]) != 'int' or self.visit(node.index[i][1]) != 'int':
+                    print(f"{node.lineno} Vector index must be int")
+                    return None
+                if node.index[i][0].intnum >= dims[i].intnum or node.index[i][1].intnum >= dims[i].intnum:
+                    print(f"{node.lineno} Index out of bounds")
+                    return None
 
-            if node.index[i].intnum >= dims[i].intnum:
-                print(f"{node.lineno} Index out of ouns")
-                return None
+                if node.index[i][0].intnum >= node.index[i][1].intnum:
+                    print(f"{node.lineno} Index wrong soemthing lmfao")
+                    return None
+            else:
+                if self.visit(node.index[i]) != 'int':
+                    print(f"{node.lineno} Vector index must be int")
+                    return None
+
+                if node.index[i].intnum >= dims[i].intnum:
+                    print(f"{node.lineno} Index out of bounds")
+                    return None
         return self.symbol_table.v_type[node.id.id]
 
     def visit_Unary(self, node: AST.Unary):
@@ -384,4 +394,3 @@ class TypeChecker(NodeVisitor):
                 return None
 
         return 'vector'
-
