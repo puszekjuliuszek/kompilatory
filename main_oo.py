@@ -8,7 +8,7 @@ from tree_printer import TreePrinter
 from type_checker import TypeChecker
 
 if __name__ == '__main__':
-    file_list = ["./tests/example_incorrect_1.m","./tests/init.txt","./tests/opers.txt"]
+    file_list = ["./tests/opers.txt"]
     parser = CalcParser()
     for filename in file_list:
         file_path = os.path.join(filename)

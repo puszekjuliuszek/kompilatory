@@ -279,8 +279,9 @@ class TypeChecker(NodeVisitor):
 
             if val_type == 'vector':
                 if isinstance(node.right, AST.Unary):
-                    self.symbol_table.v_dims[left_id] = node.right.expr.dims[::-1]
-                    self.symbol_table.v_type[left_id] = node.right.expr.v_type
+                    # -- czy zadziała
+                    self.symbol_table.v_dims[left_id] = go_into_exprs(node.right.expr).dims[::-1]
+                    self.symbol_table.v_type[left_id] = go_into_exprs(node.right.expr).v_type
                 elif isinstance(node.right.dims, AST.IntNum):
                     # print(node.right)
                     self.symbol_table.v_dims[left_id] = node.right.dims.intnum
@@ -384,4 +385,10 @@ class TypeChecker(NodeVisitor):
                 return None
 
         return 'vector'
+
+
+def go_into_exprs(expr):
+    while hasattr(expr, "expr"):
+        expr = expr.expr
+    return expr
 
