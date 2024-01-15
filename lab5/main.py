@@ -1,20 +1,19 @@
-#object oriented version
-import os
-
+from Mparser import MatrixParser
 from scanner_oo import Scanner
-from parser_oo import CalcParser
 from sly.lex import LexError
-from tree_printer import TreePrinter
-from type_checker import TypeChecker
-from Interpreter import Interpreter
+from TreePrinter import TreePrinter
+from TypeChecker import TypeChecker
+import os
+from lab5.Interpreter import Interpreter
 
 
 
 if __name__ == "__main__":
-    file_list = ["./tests/triangle.m"]
-    parser = CalcParser()
+    folder_path = 'tests'
+    file_list = os.listdir(folder_path)
     for filename in file_list:
-        file_path = os.path.join(filename)
+        if filename != "example_2.txt": continue
+        file_path = os.path.join(folder_path, filename)
 
         if os.path.isfile(file_path):
             with open(file_path, 'r') as file:
@@ -22,7 +21,7 @@ if __name__ == "__main__":
                 print(f'Testing {filename}:')
             try:
                 TreePrinter()
-                parser = CalcParser()
+                parser = MatrixParser()
                 typeChecker = TypeChecker()
                 interpreter = Interpreter()
                 cos = parser.parse(Scanner().tokenize(file_contents))
@@ -34,5 +33,3 @@ if __name__ == "__main__":
                     interpreter.visit(cos)
             except LexError as e:
                 print(f"Lexer error: {e}")
-
-
