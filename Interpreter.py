@@ -130,12 +130,18 @@ class Interpreter(object):
             else:
                 for instruction in node.if_body:
                     instruction.accept(self)
-            self.memory.pop()
+            try:
+                self.memory.pop()
+            finally:
+                pass
         else:
             if node.else_body is not None:
                 self.memory.push('else')
                 node.else_body.accept(self)
-                self.memory.pop()
+                try:
+                    self.memory.pop()
+                finally:
+                    pass
 
     @when(AST.While)
     def visit(self, node: AST.While):
@@ -151,7 +157,11 @@ class Interpreter(object):
                 continue
             except BreakException:
                 break
-        self.memory.pop()
+        try:
+            self.memory.pop()
+        finally:
+            pass
+
 
     @when(AST.For)
     def visit(self, node: AST.For):
@@ -173,7 +183,10 @@ class Interpreter(object):
                 break
             finally:
                 self.memory.set(iterator.id, self.memory.get(iterator.id) + 1)
-        self.memory.pop()
+        try:
+            self.memory.pop()
+        finally:
+            pass
 
     @when(AST.Return)
     def visit(self, node: AST.Return):
