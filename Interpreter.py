@@ -124,69 +124,65 @@ class Interpreter(object):
     def visit(self, node: AST.If):
         condition = node.cond.accept(self)
         if condition:
-            self.memory.push('if')
-            if isinstance(node.if_body, AST.Instructions):
-                node.if_body.accept(self)
-            else:
-                for instruction in node.if_body:
-                    instruction.accept(self)
             try:
-                self.memory.pop()
+                self.memory.push('if')
+                if isinstance(node.if_body, AST.Instructions):
+                    node.if_body.accept(self)
+                else:
+                    for instruction in node.if_body:
+                        instruction.accept(self)
             finally:
-                pass
+                self.memory.pop()
         else:
             if node.else_body is not None:
-                self.memory.push('else')
-                node.else_body.accept(self)
                 try:
-                    self.memory.pop()
+                    self.memory.push('else')
+                    node.else_body.accept(self)
                 finally:
-                    pass
+                    self.memory.pop()
 
     @when(AST.While)
     def visit(self, node: AST.While):
-        self.memory.push("while")
-        while node.cond.accept(self):
-            try:
-                if isinstance(node.body, list):
-                    for instruction in node.body:
-                        instruction.accept(self)
-                else:
-                    node.body.accept(self)
-            except ContinueException:
-                continue
-            except BreakException:
-                break
         try:
-            self.memory.pop()
+            self.memory.push("while")
+            while node.cond.accept(self):
+                try:
+                    if isinstance(node.body, list):
+                        for instruction in node.body:
+                            instruction.accept(self)
+                    else:
+                        node.body.accept(self)
+                except ContinueException:
+                    continue
+                except BreakException:
+                    break
         finally:
-            pass
+            self.memory.pop()
 
 
     @when(AST.For)
     def visit(self, node: AST.For):
-        iterator = node.id
-        start = node.cond_start.accept(self)
-        end = node.cond_end.accept(self)
-        self.memory.push("for")
-        self.memory.set(iterator.id, start)
-        while self.memory.get(iterator.id) <= end:
-            try:
-                if isinstance(node.body, list):
-                    for instruction in node.body:
-                        instruction.accept(self)
-                else:
-                    node.body.accept(self)
-            except ContinueException:
-                continue
-            except BreakException:
-                break
-            finally:
-                self.memory.set(iterator.id, self.memory.get(iterator.id) + 1)
         try:
-            self.memory.pop()
+            iterator = node.id
+            start = node.cond_start.accept(self)
+            end = node.cond_end.accept(self)
+            self.memory.push("for")
+            self.memory.set(iterator.id, start)
+            while self.memory.get(iterator.id) <= end:
+                try:
+                    if isinstance(node.body, list):
+                        for instruction in node.body:
+                            instruction.accept(self)
+                    else:
+                        node.body.accept(self)
+                except ContinueException:
+                    continue
+                except BreakException:
+                    break
+                finally:
+                    self.memory.set(iterator.id, self.memory.get(iterator.id) + 1)
         finally:
-            pass
+            self.memory.pop()
 
     @when(AST.Return)
     def visit(self, node: AST.Return):
