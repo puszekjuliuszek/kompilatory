@@ -255,7 +255,7 @@ class Interpreter(object):
     def visit(self, node: AST.Variable):
         matrix = self.memory.get(node.id.id)
 
-        # Tylko dla macierzy 2x2
+        #variable to to samo co reference, tutaj robimy tylko macierze dwuwymiarowe
         x = node.index[0].accept(self)
         y = node.index[1].accept(self)
 
